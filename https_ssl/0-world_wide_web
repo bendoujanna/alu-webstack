@@ -1,30 +1,27 @@
 #!/usr/bin/env bash
-# Bash script to display information about subdomains
+#world wide web
+domain="$1"
+sub="$2"
 
-domain=$1
-subdomain=$2
-
-# Function to query a subdomain
 get_record() {
-    local sd=$1
-    local dom=$2
-    # Use dig to get the record type and IP
-    dig_output=$(dig +short $sd.$dom)
-    if [ -z "$dig_output" ]; then
-        echo "The subdomain $sd does not exist or has no A record"
+    local full="$1.$domain"
+    local ip=$(dig +short "$full")
+
+    if [[ -z "$ip" ]]; then
+        echo "The subdomain $1 does not exist or has no A record"
     else
-        # Extract record type using dig +noall +answer
-        record_type=$(dig $sd.$dom +noall +answer | awk '{print $4}')
-        echo "The subdomain $sd is a $record_type record and points to $dig_output"
+        echo "The subdomain $1 is a A record and points to $ip"
     fi
 }
 
-# If a specific subdomain is provided
-if [ -n "$subdomain" ]; then
-    get_record $subdomain $domain
-else
-    # Default order: www, lb-01, web-01, web-02
-    for sd in www lb-01 web-01 web-02; do
-        get_record $sd $domain
+if [[ -z "$domain" ]]; then
+    exit 0
+fi
+
+if [[ -z "$sub" ]]; then
+    for s in www lb-01 web-01 web-02; do
+        get_record "$s"
     done
+else
+    get_record "$sub"
 fi
