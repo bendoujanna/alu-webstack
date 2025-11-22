@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#world wide web
+domain="$1"
+sub="$2"
+
+get_record() {
+    local full="$1.$domain"
+    local ip=$(dig +short "$full")
+
+    if [[ -z "$ip" ]]; then
+        echo "The subdomain $1 does not exist or has no A record"
+    else
+        echo "The subdomain $1 is a A record and points to $ip"
+    fi
+}
+
+if [[ -z "$domain" ]]; then
+    exit 0
+fi
+
+if [[ -z "$sub" ]]; then
+    for s in www lb-01 web-01 web-02; do
+        get_record "$s"
+    done
+else
+    get_record "$sub"
+fi
